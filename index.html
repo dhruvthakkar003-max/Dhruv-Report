@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dhruv Work Report</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#123b5d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#1f2937}
+header{background:#123b5d;color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+header h2{margin:0 0 4px}.container{max-width:1250px;margin:auto;padding:16px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}.tab{border:0;padding:10px 15px;border-radius:7px;background:#e5eaf0;font-weight:bold;cursor:pointer}.tab.active{background:#1769aa;color:#fff}
+.card{background:#fff;border-radius:10px;padding:18px;margin-bottom:15px;box-shadow:0 2px 8px #0001}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}label{font-size:12px;font-weight:bold;display:block;margin-bottom:5px;color:#4b5563}
+input,select,textarea{width:100%;padding:10px;border:1px solid #cbd5df;border-radius:6px;font-size:14px}textarea{min-height:80px;resize:vertical}
+button{padding:10px 15px;border:0;border-radius:6px;cursor:pointer;font-weight:bold}.primary{background:#1769aa;color:white}.secondary{background:#e7edf2}.danger{background:#fee2e2;color:#a00}.success{background:#e8f5e9;color:#176b2c}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.hidden{display:none}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.metric{border:1px solid #ddd;border-radius:8px;padding:14px}.metric small{display:block;color:#666}.metric b{font-size:20px}
+.tablewrap{overflow:auto;max-height:560px}table{border-collapse:collapse;width:100%;min-width:1400px}th,td{padding:8px;border-bottom:1px solid #ddd;text-align:left;font-size:13px;vertical-align:top}th{background:#eef3f7;position:sticky;top:0}
+.note{color:#6b7280;font-size:12px}@media(max-width:850px){.grid{grid-template-columns:repeat(2,1fr)}.summary{grid-template-columns:repeat(2,1fr)}}@media(max-width:500px){.grid,.summary{grid-template-columns:1fr}}
+
+.aztec-logo{height:52px;width:auto;max-width:220px;object-fit:contain;background:#fff;border-radius:5px;padding:3px}
+.status-badge{display:inline-block;padding:4px 9px;border-radius:12px;font-weight:700;font-size:12px}
+.status-completed{background:#dcfce7;color:#166534}.status-progress{background:#dbeafe;color:#1d4ed8}
+.status-planned{background:#ffedd5;color:#9a3412}.status-delayed{background:#fee2e2;color:#b91c1c}.status-legend{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px}
+
+.status-badge{display:inline-block;padding:5px 9px;border-radius:999px;font-weight:bold;font-size:12px;white-space:nowrap}
+.status-completed{background:#c6efce;color:#166534}
+.status-progress{background:#bdd7ee;color:#1d4ed8}
+.status-planned{background:#fce4d6;color:#9a3412}
+.status-delayed{background:#ffc7ce;color:#b91c1c}
+</style>
+</head>
+<body>
+<header>
+<div style="display:flex;align-items:center;gap:14px">
+<img src="aztec-logo.png" class="aztec-logo" alt="AZTEC Fluids & Machinery">
+<div><h2>Dhruv Work Report</h2><small>AZTEC Fluids & Machinery • Daily work entry • Monthly summary • Excel export</small></div>
+</div>
+<button id="installBtn" class="secondary" style="display:none" onclick="installApp()">Install App</button>
+</header>
+<div class="container">
+<div class="tabs">
+<button class="tab active" onclick="showTab('entry',this)">Add Work</button>
+<button class="tab" onclick="showTab('records',this)">Work Records</button>
+<button class="tab" onclick="showTab('summary',this)">Summary</button>
+<button class="tab" onclick="showTab('backup',this)">Backup</button>
+</div>
+
+<section id="entry" class="card">
+<h3>Daily Work Report Entry</h3>
+<form id="workForm">
+<div class="grid">
+<div><label>Date *</label><input id="date" type="date" required></div>
+<div><label>Customer Name *</label><input id="customer" required></div>
+<div><label>Engineer Name *</label><input id="engineer" required></div>
+<div><label>KRA Category *</label>
+<select id="kra" required>
+<option value="">Select KRA</option>
+<option>Technical Escalation Management</option>
+<option>Training & Skill Development</option>
+<option>New Product Assessment</option>
+<option>Sales & Service Alignment</option>
+<option>In-House Engineering Operations</option>
+<option>Process Improvement & Quality</option>
+<option>Key Account Visits</option>
+</select></div>
+<div><label>Status *</label>
+<select id="status" required><option value="">Select Status</option><option>Planned</option><option>In Progress</option><option>Completed</option><option>Delayed</option></select></div>
+<div><label>Completion Date</label><input id="completion" type="date"></div>
+<div><label>Hours / Duration</label><input id="hours" placeholder="Example: 8 hours / 2 days"></div>
+<div><label>Escalation Owner</label><input id="owner"></div>
+</div>
+<br>
+<div class="grid">
+<div style="grid-column:span 2"><label>Work Description *</label><textarea id="description" required></textarea></div>
+<div style="grid-column:span 2"><label>Action Taken *</label><textarea id="action" required></textarea></div>
+<div style="grid-column:span 2"><label>Remarks</label><textarea id="remarks"></textarea></div>
+<div style="grid-column:span 2"><label>Problem Report</label><textarea id="problem"></textarea></div>
+<div style="grid-column:span 2"><label>Solution By Owner</label><textarea id="solution"></textarea></div>
+</div>
+<div class="actions"><button class="primary">Save Work Report</button><button type="button" class="secondary" onclick="resetForm()">Clear</button></div>
+</form>
+</section>
+
+<section id="records" class="card hidden">
+<h3>Work Records</h3>
+<div class="grid">
+<div><label>From Date</label><input id="filterFrom" type="date" onchange="render()"></div>
+<div><label>To Date</label><input id="filterTo" type="date" onchange="render()"></div>
+<div><label>Search</label><input id="search" placeholder="Customer / Engineer / Work..." oninput="render()"></div>
+<div><label>Status</label><select id="filterStatus" onchange="render()"><option value="">All</option><option>Planned</option><option>In Progress</option><option>Completed</option><option>Delayed</option></select></div>
+</div>
+<div class="actions"><button class="primary" onclick="exportExcel()">Export Excel</button><button class="secondary" onclick="clearFilters()">Clear Filters</button></div>
+<p class="note" id="count"></p>
+<div class="status-legend">
+<span class="status-badge status-completed">Completed</span>
+<span class="status-badge status-progress">In Progress</span>
+<span class="status-badge status-planned">Planned</span>
+<span class="status-badge status-delayed">Delayed</span>
+</div>
+<div class="tablewrap"><table><thead><tr>
+<th>Date</th><th>Customer Name</th><th>Engineer Name</th><th>KRA Category</th><th>Work Description</th><th>Action Taken</th><th>Status</th><th>Completion Date</th><th>Hours</th><th>Remarks</th><th>Escalation Owner</th><th>Problem Report</th><th>Solution By Owner</th><th>Action</th>
+</tr></thead><tbody id="tbody"></tbody></table></div>
+</section>
+
+<section id="summary" class="card hidden">
+<h3>Monthly Summary</h3>
+<div style="max-width:260px"><label>Select Month</label><input id="month" type="month" onchange="renderSummary()"></div>
+<div class="summary" style="margin-top:15px">
+<div class="metric"><small>Total Work Entries</small><b id="mTotal">0</b></div>
+<div class="metric"><small>Completed</small><b id="mCompleted">0</b></div>
+<div class="metric"><small>In Progress</small><b id="mProgress">0</b></div>
+<div class="metric"><small>Delayed</small><b id="mDelayed">0</b></div>
+</div>
+<p class="note" id="kraSummary"></p>
+</section>
+
+<section id="backup" class="card hidden">
+<h3>Backup / Restore</h3>
+<p class="note">Work reports are stored in this browser. Use Backup before changing device or clearing browser data.</p>
+<div class="actions"><button class="success" onclick="backup()">Download Backup</button><button class="secondary" onclick="document.getElementById('restoreFile').click()">Restore Backup</button><button class="danger" onclick="deleteAll()">Delete All</button></div>
+<input id="restoreFile" type="file" accept=".json" style="display:none" onchange="restore(event)">
+</section>
+</div>
+
+<script>
+const KEY='dhruv_work_report_v1';let data=JSON.parse(localStorage.getItem(KEY)||'[]');
+const $=id=>document.getElementById(id);$('date').valueAsDate=new Date();$('month').value=new Date().toISOString().slice(0,7);
+
+function save(){localStorage.setItem(KEY,JSON.stringify(data));render();renderSummary()}
+function getForm(){return{id:Date.now(),date:$('date').value,customer:$('customer').value.trim(),engineer:$('engineer').value.trim(),kra:$('kra').value,description:$('description').value.trim(),action:$('action').value.trim(),status:$('status').value,completion:$('completion').value,hours:$('hours').value.trim(),remarks:$('remarks').value.trim(),owner:$('owner').value.trim(),problem:$('problem').value.trim(),solution:$('solution').value.trim()}}
+workForm.onsubmit=e=>{e.preventDefault();const record=getForm();if(!record.status){alert('Please select a Status before saving.');$('status').focus();return;}data.push(record);save();alert('Work report saved successfully. Status: '+record.status);resetForm()}
+function resetForm(){workForm.reset();date.valueAsDate=new Date()}
+function filtered(){let q=search.value.toLowerCase();return data.filter(x=>(!filterFrom.value||x.date>=filterFrom.value)&&(!filterTo.value||x.date<=filterTo.value)&&(!filterStatus.value||x.status===filterStatus.value)&&(!q||[x.customer,x.engineer,x.kra,x.description,x.action,x.remarks,x.owner,x.problem,x.solution].join(' ').toLowerCase().includes(q))).sort((a,b)=>b.date.localeCompare(a.date))}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function statusBadge(s){let c=s==='Completed'?'status-completed':s==='In Progress'?'status-progress':s==='Planned'?'status-planned':s==='Delayed'?'status-delayed':'';return `<span class="status-badge ${c}">${esc(s)}</span>`}
+function render(){
+ let rows=filtered();
+ $('count').textContent=`Showing ${rows.length} of ${data.length} records`;
+ $('tbody').innerHTML=rows.map(x=>{
+   const cls=x.status==='Completed'?'status-completed':
+              x.status==='In Progress'?'status-progress':
+              x.status==='Planned'?'status-planned':
+              x.status==='Delayed'?'status-delayed':'';
+   const cells=[x.date,x.customer,x.engineer,x.kra,x.description,x.action];
+   const normal=cells.map(v=>`<td>${esc(v)}</td>`).join('');
+   const statusCell=`<td><span class="status-badge ${cls}">${esc(x.status||'Not set')}</span></td>`;
+   const rest=[x.completion,x.hours,x.remarks,x.owner,x.problem,x.solution].map(v=>`<td>${esc(v)}</td>`).join('');
+   return `<tr>${normal}${statusCell}${rest}<td><button class="danger" onclick="del(${x.id})">Delete</button></td></tr>`;
+ }).join('');
+}
+function del(id){if(confirm('Delete this work report?')){data=data.filter(x=>x.id!==id);save()}}
+function clearFilters(){filterFrom.value='';filterTo.value='';search.value='';filterStatus.value='';render()}
+function renderSummary(){let m=month.value,rows=data.filter(x=>x.date.slice(0,7)===m);mTotal.textContent=rows.length;mCompleted.textContent=rows.filter(x=>x.status==='Completed').length;mProgress.textContent=rows.filter(x=>x.status==='In Progress').length;mDelayed.textContent=rows.filter(x=>x.status==='Delayed').length;let counts={};rows.forEach(x=>counts[x.kra]=(counts[x.kra]||0)+1);kraSummary.textContent=Object.entries(counts).map(([k,v])=>`${k}: ${v}`).join(' • ')||'No entries for this month.'}
+function exportExcel(){
+ let rows=filtered();
+ if(!rows.length){alert('No records to export.');return}
+ let months=[...new Set(rows.map(x=>x.date.slice(0,7)))],monthYear='Multiple Months';
+ if(months.length===1){let d=new Date(months[0]+'-01T00:00:00');monthYear=d.toLocaleString('en-US',{month:'long',year:'numeric'})}
+
+ const out=[
+   ['AZTEC Fluids & Machinery'],
+   ['Dhruv Work Report'],
+   ['Month & Year',monthYear],
+   [],
+   ['Date','Customer Name','Engineer Name','KRA Category','Work Description','Action Taken','Status','Completion Date','Hours','Remarks','Escalation Owner','Problem Report','Solution By Owner']
+ ];
+ rows.forEach(x=>out.push([x.date,x.customer,x.engineer,x.kra,x.description,x.action,x.status,x.completion,x.hours,x.remarks,x.owner,x.problem,x.solution]));
+ out.push([]);
+ out.push(['Total Work Entries',rows.length]);
+ out.push(['Completed',rows.filter(x=>x.status==='Completed').length]);
+ out.push(['In Progress',rows.filter(x=>x.status==='In Progress').length]);
+ out.push(['Planned',rows.filter(x=>x.status==='Planned').length]);
+ out.push(['Delayed',rows.filter(x=>x.status==='Delayed').length]);
+
+ const ws=XLSX.utils.aoa_to_sheet(out);
+ ws['!cols']=[{wch:13},{wch:22},{wch:22},{wch:32},{wch:45},{wch:45},{wch:16},{wch:16},{wch:15},{wch:35},{wch:25},{wch:40},{wch:40}];
+ ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:12}},{s:{r:1,c:0},e:{r:1,c:12}}];
+
+ const border={top:{style:'thin',color:{rgb:'FFD9E1E8'}},bottom:{style:'thin',color:{rgb:'FFD9E1E8'}},left:{style:'thin',color:{rgb:'FFD9E1E8'}},right:{style:'thin',color:{rgb:'FFD9E1E8'}}};
+ const statusStyles={
+   'Completed':{fill:'FFC6EFCE',font:'FF166534'},
+   'In Progress':{fill:'FFBDD7EE',font:'FF1D4ED8'},
+   'Planned':{fill:'FFFCE4D6',font:'FF9A3412'},
+   'Delayed':{fill:'FFFFC7CE',font:'FFB91C1C'}
+ };
+
+ ['A1','A2'].forEach(cell=>{
+   if(ws[cell]) ws[cell].s={font:{bold:true,sz:cell==='A1'?16:14,color:{rgb:'FF123B5D'}},alignment:{horizontal:'center',vertical:'center'}};
+ });
+ if(ws['A3']) ws['A3'].s={font:{bold:true,color:{rgb:'FF123B5D'}}};
+
+ for(let c=0;c<13;c++){
+   const cell=ws[XLSX.utils.encode_cell({r:4,c})];
+   if(cell) cell.s={font:{bold:true,color:{rgb:'FFFFFFFF'}},fill:{patternType:'solid',fgColor:{rgb:'FF123B5D'}},alignment:{horizontal:'center',vertical:'center',wrapText:true},border};
+ }
+
+ rows.forEach((x,i)=>{
+   const rr=5+i;
+   for(let c=0;c<13;c++){
+     const cell=ws[XLSX.utils.encode_cell({r:rr,c})];
+     if(cell) cell.s={alignment:{vertical:'top',wrapText:true},border};
+   }
+   const cell=ws[XLSX.utils.encode_cell({r:rr,c:6})], st=statusStyles[x.status];
+   if(cell && st) cell.s={font:{bold:true,color:{rgb:st.font}},fill:{patternType:'solid',fgColor:{rgb:st.fill}},alignment:{horizontal:'center',vertical:'center'},border};
+ });
+
+ const summaryStart=5+rows.length+1;
+ for(let r=summaryStart;r<summaryStart+5;r++){
+   for(let c=0;c<2;c++){
+     const cell=ws[XLSX.utils.encode_cell({r,c})];
+     if(cell) cell.s={font:{bold:true},border};
+   }
+ }
+ [['Completed',summaryStart+1],['In Progress',summaryStart+2],['Planned',summaryStart+3],['Delayed',summaryStart+4]].forEach(([st,rr])=>{
+   const cell=ws[XLSX.utils.encode_cell({r:rr,c:0})], s=statusStyles[st];
+   if(cell) cell.s={font:{bold:true,color:{rgb:s.font}},fill:{patternType:'solid',fgColor:{rgb:s.fill}},border};
+ });
+
+ ws['!rows']=[];ws['!rows'][0]={hpt:26};ws['!rows'][1]={hpt:22};ws['!rows'][4]={hpt:32};
+
+ const wb=XLSX.utils.book_new();
+ XLSX.utils.book_append_sheet(wb,ws,'Work Report');
+ XLSX.writeFile(wb,'Dhruv_Work_Report_AZTEC.xlsx',{cellStyles:true});
+}
+function backup(){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='Dhruv_Work_Report_Backup.json';a.click()}
+function restore(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!Array.isArray(x))throw 1;data=x;save();alert('Backup restored successfully.')}catch{alert('Invalid backup file.')}};r.readAsText(f)}
+function deleteAll(){if(confirm('Delete all work reports?')){data=[];save()}}
+function showTab(id,b){document.querySelectorAll('section').forEach(x=>x.classList.add('hidden'));$(id).classList.remove('hidden');document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');render();renderSummary()}
+let deferredInstallPrompt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;installBtn.style.display='inline-block'});async function installApp(){if(deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null}else alert('Open this app from its HTTPS website in Chrome and choose Install App from the browser menu.')}
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js'));
+render();renderSummary();
+</script>
+</body>
+</html>
